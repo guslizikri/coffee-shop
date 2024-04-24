@@ -1,8 +1,8 @@
 <div align='center' style="text-align: center;">
 
-<h1 style="border:0;margin:1rem">Coffeshop Backend</h1>
+<h1 style="border:0;margin:1rem">Coffeeshop Backend</h1>
 
-Backend for Zwallet
+Backend for CoffeeShop
 
 <hr>
 <br>
@@ -26,7 +26,7 @@ Backend for Zwallet
 
 ## Overview
 
-CoffeeShop is marketplace for people loving coffee.
+CoffeeShop.
 
 ## Features
 
@@ -63,43 +63,31 @@ CoffeeShop is marketplace for people loving coffee.
 4. Create .env file
 
    ```env
-    DB_HOST = [YOUR DATABASE HOST]
-    DB_USER = [YOUR DATABASE USER]
-    DB_PASSWORD = [YOUR DATABASE PASSWORD]
-    DB_DATABASE = [YOUR DATABASE NAME]
-
-    PORT = [YOUR PORT]
-
+    APP_ENV=dev
+   PORT=8081
    ```
+
+   DB_HOST=""
+   DB_NAME=""
+   DB_USER=""
+   DB_PASS=""
+   DB_PORT=5432
+
+````
 
 5. Start the local server
 
-   ```bash
-   go run cmd/main.go
-   ```
-
+```bash
+go run cmd/main.go
+````
 
 ## Postman Collection
 
-You can download in <a href='https://drive.google.com/drive/folders/1n-yIUA23_JWdll-l-HOuLL0YYPfeemtJ?usp=sharing'> Here </a>
-
-
-## Resources
-
-Special thanks to:
-
-- [Vercel](https://vercel.com) - deploying code
+You can download in <a href='#'> Here </a>
 
 ## Contributors
 
 Currently, there are no contributors to this project. If you would like to contribute, you can submit a pull request.
-
-## Related Projects
-
-
-## License
-
-This project is licensed under the ISC License
 
 ## Suggestion
 

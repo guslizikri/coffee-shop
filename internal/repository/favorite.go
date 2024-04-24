@@ -24,14 +24,14 @@ func (r *RepoFavorite) ReadFavorite(data *models.Favorite, page int, limit int, 
 		metaQuery += fmt.Sprintf(`limit %d offset %d`, limit, offset)
 	}
 	if search != "" {
-		filterQuery += fmt.Sprintf(`AND LOWER(p.name_product) like LOWER('%s')`, "%"+search+"%")
+		filterQuery += fmt.Sprintf(`AND LOWER(name_product) like LOWER('%s')`, "%"+search+"%")
 	}
 
 	if category != "" {
-		filterQuery += fmt.Sprintf(`AND LOWER(p.category) like LOWER('%s')`, "%"+category+"%")
+		filterQuery += fmt.Sprintf(`AND LOWER(category) like LOWER('%s')`, "%"+category+"%")
 	}
 
-	query := fmt.Sprintf(`SELECT f.id as id_product p.name_product, p.description, p.image, p.category, u.email from public.products p 
+	query := fmt.Sprintf(`SELECT f.id, p.name_product, p.description, p.image, p.category, u.email from public.products p 
 	inner JOIN public.favorites f ON f.product_id = p.id
 	inner JOIN public.users u ON f.user_id = u.id WHERE true %s %s`, filterQuery, metaQuery)
 

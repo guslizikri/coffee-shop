@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"coffee-shop/config"
 	"coffee-shop/internal/models"
 	"coffee-shop/internal/repository"
+	"coffee-shop/pkg"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,36 +13,37 @@ import (
 )
 
 type HandlerProduct struct {
-	*repository.RepoProduct
+	repository.RepoProductIF
 }
 
-func NewProduct(r *repository.RepoProduct) *HandlerProduct {
+func NewProduct(r repository.RepoProductIF) *HandlerProduct {
 	return &HandlerProduct{r}
 }
 
 func (h *HandlerProduct) GetProduct(ctx *gin.Context) {
-	var Product models.Product
 	page := ctx.DefaultQuery("page", "1")
 
 	limit := ctx.DefaultQuery("limit", "5")
-	category := ctx.DefaultQuery("category", "")
-	search := ctx.DefaultQuery("search", "")
+	category := ctx.Query("category")
+	search := ctx.Query("search")
 
 	pageInt, _ := strconv.Atoi(page)
 	limitInt, _ := strconv.Atoi(limit)
 
-	if err := ctx.ShouldBind(&Product); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	result, err := h.ReadProduct(&Product, pageInt, limitInt, category, search)
+	result, err := h.ReadProduct(models.Query{
+		Name:     "%" + search + "%",
+		Page:     pageInt,
+		Limit:    limitInt,
+		Category: "%" + category + "%",
+	})
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		pkg.NewRes(http.StatusBadRequest, &config.Result{
+			Data: err.Error(),
+		}).Send(ctx)
 		return
 	}
 
-	ctx.JSON(200, result)
+	pkg.NewRes(200, result).Send(ctx)
 }
 
 func (h *HandlerProduct) PostProduct(ctx *gin.Context) {
@@ -49,7 +53,7 @@ func (h *HandlerProduct) PostProduct(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-
+	product.Image = ctx.MustGet("image").(*string)
 	result, err := h.CreateProduct(&product)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
@@ -62,10 +66,14 @@ func (h *HandlerProduct) PostProduct(ctx *gin.Context) {
 func (h *HandlerProduct) PatchProduct(ctx *gin.Context) {
 	var product models.Product
 	product.Id = ctx.Param("id")
+	product.Image = ctx.MustGet("image").(*string)
+
 	if err := ctx.ShouldBind(&product); err != nil {
 		ctx.AbortWithError(400, err)
 		return
 	}
+	fmt.Println(product.Image)
+	fmt.Println(product.Name_product)
 
 	result, err := h.UpdateProduct(&product)
 	if err != nil {

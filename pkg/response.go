@@ -1,54 +1,43 @@
 package pkg
 
 import (
-	"encoding/json"
-	"net/http"
+	"coffee-shop/config"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Response struct {
 	Code        int         `json:"-"`
 	Status      string      `json:"status"`
-	IsError     bool        `json:"isError"`
 	Data        interface{} `json:"data,omitempty"`
+	Meta        interface{} `json:"meta,omitempty"`
 	Description interface{} `json:"description,omitempty"`
 }
 
-func (res *Response) Send(w http.ResponseWriter) {
-
-	w.Header().Set("Content-type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-CSRF-Token")
-
-	if res.IsError {
-		w.WriteHeader(res.Code)
-	}
-
-	err := json.NewEncoder(w).Encode(res)
-	if err != nil {
-		w.Write([]byte("Error When Encode respone"))
-	}
-
+func (r *Response) Send(ctx *gin.Context) {
+	ctx.JSON(r.Code, r)
+	ctx.Abort()
 }
 
-func GetResponse(data interface{}, code int, isError bool) *Response {
-
-	if isError {
-		return &Response{
-			Code:        code,
-			Status:      getStatus(code),
-			IsError:     isError,
-			Description: data,
-		}
-
-	}
-	return &Response{
-		Code:    code,
-		Status:  getStatus(code),
-		IsError: isError,
-		Data:    data,
+func NewRes(code int, data *config.Result) *Response {
+	var response = Response{
+		Code:   code,
+		Status: getStatus(code),
 	}
 
+	if response.Code >= 400 {
+		response.Description = data.Data
+	} else if data.Message != nil {
+		response.Description = data.Message
+	} else {
+		response.Data = data.Data
+	}
+
+	if data.Meta != nil {
+		response.Meta = data.Meta
+	}
+
+	return &response
 }
 
 func getStatus(code int) (desc string) {

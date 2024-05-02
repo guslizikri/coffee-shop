@@ -13,3 +13,5 @@ type Favorite struct {
 	Category     string     `db:"category" form:"category" json:"category"`
 	Email        *string    `db:"email" form:"email" json:"email"`
 }
+
+type Favorites []Favorite

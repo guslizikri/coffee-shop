@@ -10,30 +10,28 @@ import (
 )
 
 type HandlerFavorite struct {
-	*repository.RepoFavorite
+	repository.RepoFavoriteIF
 }
 
-func NewFavorite(r *repository.RepoFavorite) *HandlerFavorite {
+func NewFavorite(r repository.RepoFavoriteIF) *HandlerFavorite {
 	return &HandlerFavorite{r}
 }
 
 func (h *HandlerFavorite) GetFavorite(ctx *gin.Context) {
-	var Favorite models.Favorite
 	page := ctx.DefaultQuery("page", "1")
 
 	limit := ctx.DefaultQuery("limit", "5")
 	category := ctx.DefaultQuery("category", "")
-	search := ctx.DefaultQuery("search", "")
+	search := ctx.Query("search")
 
 	pageInt, _ := strconv.Atoi(page)
 	limitInt, _ := strconv.Atoi(limit)
 
-	if err := ctx.ShouldBind(&Favorite); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	result, err := h.ReadFavorite(&Favorite, pageInt, limitInt, category, search)
+	result, err := h.ReadFavorite(models.Query{
+		Name:     "%" + search + "%",
+		Page:     pageInt,
+		Limit:    limitInt,
+		Category: "%" + category + "%"})
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return

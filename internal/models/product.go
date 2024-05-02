@@ -11,3 +11,12 @@ type Product struct {
 	CreatedAt    *time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt    *time.Time `db:"updated_at" json:"updated_at"`
 }
+
+type Query struct {
+	Page     int
+	Limit    int
+	Name     string
+	Category string
+}
+
+type Products []Product

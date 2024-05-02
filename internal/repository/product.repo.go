@@ -1,12 +1,20 @@
 package repository
 
 import (
+	"coffee-shop/config"
 	"coffee-shop/internal/models"
 	"fmt"
+	"math"
 
 	"github.com/jmoiron/sqlx"
 )
 
+type RepoProductIF interface {
+	CreateProduct(data *models.Product) (string, error)
+	UpdateProduct(data *models.Product) (string, error)
+	DeleteProduct(data *models.Product) (string, error)
+	ReadProduct(params models.Query) (*config.Result, error)
+}
 type RepoProduct struct {
 	*sqlx.DB
 }
@@ -15,31 +23,57 @@ func NewProduct(db *sqlx.DB) *RepoProduct {
 	return &RepoProduct{db}
 }
 
-func (r *RepoProduct) ReadProduct(data *models.Product, page int, limit int, category string, search string) ([]models.Product, error) {
-
+func (r *RepoProduct) ReadProduct(params models.Query) (*config.Result, error) {
+	var data models.Products
+	var metas config.Metas
+	var count int
 	var filterQuery string
 	var metaQuery string
-	offset := (page - 1) * limit
 
-	if page != 0 && limit != 0 {
-		metaQuery += fmt.Sprintf(`limit %d offset %d`, limit, offset)
-	}
-	if search != "" {
-		filterQuery += fmt.Sprintf(`AND LOWER(name_product) like LOWER('%s')`, "%"+search+"%")
+	// untuk sql injection '?' rebind, dipakai setelah r.rebind
+	// args gabungan meta dan filter ijection
+	var args []interface{}
+	// filter injection, digunakan saat query count total data, karena tidak butuh meta jadi dibikin var baru
+	var filter []interface{}
+
+	if params.Name != "" {
+		filterQuery += "AND LOWER(name_product) like LOWER(?)"
+		filter = append(filter, params.Name)
+		args = append(args, params.Name)
 	}
 
-	if category != "" {
-		filterQuery += fmt.Sprintf(`AND LOWER(category) like LOWER('%s')`, "%"+category+"%")
+	if params.Category != "" {
+		filterQuery += `AND LOWER(category) like LOWER(?)`
+		filter = append(filter, params.Category)
+		args = append(args, params.Category)
+	}
+	offset := (params.Page - 1) * params.Limit
+	metaQuery = "LIMIT ? OFFSET ? "
+	args = append(args, params.Limit, offset)
+	// menghitung jumlah total data yg ada, untuk dimasukkan ke metas
+	m := fmt.Sprintf(`SELECT COUNT(id) as count FROM products WHERE true %s`, filterQuery)
+	err := r.Get(&count, r.Rebind(m), filter...)
+	if err != nil {
+		return nil, err
 	}
 
 	query := fmt.Sprintf("SELECT * from products WHERE true %s %s", filterQuery, metaQuery)
 
-	Products := []models.Product{}
-	err := r.Select(&Products, query)
+	err = r.Select(&data, r.Rebind(query), args...)
 	if err != nil {
 		return nil, err
 	}
-	return Products, nil
+	check := math.Ceil(float64(count) / float64(params.Limit))
+	metas.Total = count
+	if count > 0 && params.Page != int(check) {
+		metas.Next = params.Page + 1
+	}
+
+	if params.Page != 1 {
+		metas.Prev = params.Page - 1
+	}
+
+	return &config.Result{Data: data, Meta: metas}, nil
 }
 
 func (r *RepoProduct) CreateProduct(data *models.Product) (string, error) {

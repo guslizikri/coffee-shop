@@ -2,6 +2,7 @@ package routers
 
 import (
 	"coffee-shop/internal/handlers"
+	"coffee-shop/internal/middleware"
 	"coffee-shop/internal/repository"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ func user(g *gin.Engine, d *sqlx.DB) {
 
 	route.GET("/", handler.GetUser)
 	route.POST("/", handler.PostUser)
-	route.PATCH("/:id", handler.PatchUser)
-	route.DELETE("/:id", handler.DeleteDataUser)
+	route.PATCH("/:id", middleware.Auth("user", "admin"), middleware.UploadFile, handler.PatchUser)
+	route.DELETE("/:id", middleware.Auth("user", "admin"), handler.DeleteDataUser)
 
 }

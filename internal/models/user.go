@@ -21,17 +21,19 @@ CREATE TABLE public.users (
 `
 
 type User struct {
-	Id          string     `db:"id" form:"id" json:"id" uri:"id"`
-	Displayname *string    `db:"displayname" form:"displayname" json:"displayname"`
-	First_name  *string    `db:"first_name" form:"first_name" json:"first_name"`
-	Last_name   *string    `db:"last_name" form:"last_name" json:"last_name"`
-	Gender      *string    `db:"gender" form:"gender" json:"gender"`
-	Phone       string     `db:"phone" form:"phone" json:"phone"`
-	Email       string     `db:"email" form:"email" json:"email"`
-	Password    string     `db:"password" form:"password" json:"password"`
-	Birth_date  *time.Time `db:"birth_date" form:"birth_date" json:"birth_date"`
-	Role        string     `db:"role" form:"role" json:"role"`
-	Image       *string    `db:"image" form:"image" json:"image"`
-	CreatedAt   *time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt   *time.Time `db:"updated_at" json:"updated_at"`
+	Id          string     `db:"id" form:"id" json:"id" uri:"id" valid:"-"`
+	Displayname *string    `db:"displayname" form:"displayname" json:"displayname" valid:"-"`
+	First_name  *string    `db:"first_name" form:"first_name" json:"first_name" valid:"-"`
+	Last_name   *string    `db:"last_name" form:"last_name" json:"last_name" valid:"-"`
+	Gender      *string    `db:"gender" form:"gender" json:"gender" valid:"-"`
+	Phone       string     `db:"phone" form:"phone" json:"phone" valid:"-"`
+	Email       string     `db:"email" form:"email" json:"email" valid:"email"`
+	Password    string     `db:"password" form:"password" json:"password" valid:"stringlength(6|100)~Password minimal 6"`
+	Birth_date  *time.Time `db:"birth_date" form:"birth_date" json:"birth_date" valid:"-"`
+	Role        string     `db:"role" form:"role" json:"role" valid:"-"`
+	Image       *string    `db:"image" form:"image" json:"image" valid:"-"`
+	CreatedAt   *time.Time `db:"created_at" json:"created_at" valid:"-"`
+	UpdatedAt   *time.Time `db:"updated_at" json:"updated_at" valid:"-"`
 }
+
+type Users []User

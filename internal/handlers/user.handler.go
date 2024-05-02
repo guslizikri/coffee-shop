@@ -1,16 +1,19 @@
 package handlers
 
 import (
+	"coffee-shop/config"
 	"coffee-shop/internal/models"
 	"coffee-shop/internal/repository"
+	"coffee-shop/pkg"
 	"net/http"
 	"strconv"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 )
 
 type HandlerUser struct {
-	*repository.RepoUser
+	repository.RepoUserIF
 }
 
 func NewUser(r *repository.RepoUser) *HandlerUser {
@@ -18,22 +21,17 @@ func NewUser(r *repository.RepoUser) *HandlerUser {
 }
 
 func (h *HandlerUser) GetUser(ctx *gin.Context) {
-	var user models.User
 	page := ctx.DefaultQuery("page", "1")
-
 	limit := ctx.DefaultQuery("limit", "5")
-	category := ctx.DefaultQuery("category", "")
-	search := ctx.DefaultQuery("search", "")
+	search := ctx.Query("search")
 
 	pageInt, _ := strconv.Atoi(page)
 	limitInt, _ := strconv.Atoi(limit)
 
-	if err := ctx.ShouldBind(&user); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	result, err := h.ReadUser(&user, pageInt, limitInt, category, search)
+	result, err := h.ReadUser(models.Query{
+		Name:  "%" + search + "%",
+		Page:  pageInt,
+		Limit: limitInt})
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
@@ -43,10 +41,26 @@ func (h *HandlerUser) GetUser(ctx *gin.Context) {
 }
 
 func (h *HandlerUser) PostUser(ctx *gin.Context) {
+	var err error
 	var user models.User
+	user.Role = "user"
 
-	if err := ctx.ShouldBind(&user); err != nil {
+	if err = ctx.ShouldBind(&user); err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	_, err = govalidator.ValidateStruct(&user)
+	if err != nil {
+		pkg.NewRes(401, &config.Result{
+			Data: err.Error(),
+		}).Send(ctx)
+		return
+	}
+	user.Password, err = pkg.HashPass(user.Password)
+	if err != nil {
+		pkg.NewRes(401, &config.Result{
+			Message: err.Error(),
+		}).Send(ctx)
 		return
 	}
 
@@ -55,8 +69,7 @@ func (h *HandlerUser) PostUser(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-
-	ctx.JSON(200, result)
+	pkg.NewRes(200, result).Send(ctx)
 }
 
 func (h *HandlerUser) PatchUser(ctx *gin.Context) {
@@ -66,7 +79,7 @@ func (h *HandlerUser) PatchUser(ctx *gin.Context) {
 		ctx.AbortWithError(400, err)
 		return
 	}
-
+	user.Image = ctx.MustGet("image").(*string)
 	result, err := h.UpdateUser(&user)
 	if err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)

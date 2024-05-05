@@ -10,9 +10,9 @@ import (
 )
 
 type RepoProductIF interface {
-	CreateProduct(data *models.Product) (string, error)
-	UpdateProduct(data *models.Product) (string, error)
-	DeleteProduct(data *models.Product) (string, error)
+	CreateProduct(data *models.Product) (*config.Result, error)
+	UpdateProduct(data *models.Product) (*config.Result, error)
+	DeleteProduct(data *models.Product) (*config.Result, error)
 	ReadProduct(params models.Query) (*config.Result, error)
 }
 type RepoProduct struct {
@@ -76,7 +76,7 @@ func (r *RepoProduct) ReadProduct(params models.Query) (*config.Result, error) {
 	return &config.Result{Data: data, Meta: metas}, nil
 }
 
-func (r *RepoProduct) CreateProduct(data *models.Product) (string, error) {
+func (r *RepoProduct) CreateProduct(data *models.Product) (*config.Result, error) {
 	q := `insert into products (name_product, description, image, category) 
 	VALUES(
 		:name_product,
@@ -87,14 +87,14 @@ func (r *RepoProduct) CreateProduct(data *models.Product) (string, error) {
 
 	_, err := r.NamedExec(q, data)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return "1 data product created", nil
+	return &config.Result{Message: "1 data product created"}, nil
 
 }
 
-func (r *RepoProduct) UpdateProduct(data *models.Product) (string, error) {
+func (r *RepoProduct) UpdateProduct(data *models.Product) (*config.Result, error) {
 	query := `UPDATE public.products SET
 			name_product = COALESCE(NULLIF(:name_product, ''), name_product), 
 			description = COALESCE(NULLIF(:description, ''), description), 
@@ -105,15 +105,17 @@ func (r *RepoProduct) UpdateProduct(data *models.Product) (string, error) {
 
 	_, err := r.NamedExec(query, data)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return "update product data successful", nil
+	return &config.Result{Message: "1 data product updated"}, nil
+
 }
-func (r *RepoProduct) DeleteProduct(data *models.Product) (string, error) {
+func (r *RepoProduct) DeleteProduct(data *models.Product) (*config.Result, error) {
 	query := `DELETE FROM public.products WHERE id=:id`
 	_, err := r.NamedExec(query, data)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return "delete Product data successful", nil
+	return &config.Result{Message: "1 data product deleted"}, nil
+
 }

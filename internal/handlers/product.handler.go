@@ -59,8 +59,8 @@ func (h *HandlerProduct) PostProduct(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
+	pkg.NewRes(201, result).Send(ctx)
 
-	ctx.JSON(200, result)
 }
 
 func (h *HandlerProduct) PatchProduct(ctx *gin.Context) {
@@ -80,8 +80,8 @@ func (h *HandlerProduct) PatchProduct(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
+	pkg.NewRes(200, result).Send(ctx)
 
-	ctx.JSON(200, result)
 }
 
 func (h *HandlerProduct) DeleteDataProduct(ctx *gin.Context) {
@@ -97,5 +97,6 @@ func (h *HandlerProduct) DeleteDataProduct(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, result)
+	pkg.NewRes(200, result).Send(ctx)
+
 }

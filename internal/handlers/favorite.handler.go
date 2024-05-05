@@ -3,6 +3,7 @@ package handlers
 import (
 	"coffee-shop/internal/models"
 	"coffee-shop/internal/repository"
+	"coffee-shop/pkg"
 	"net/http"
 	"strconv"
 
@@ -37,7 +38,8 @@ func (h *HandlerFavorite) GetFavorite(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, result)
+	pkg.NewRes(200, result).Send(ctx)
+
 }
 
 func (h *HandlerFavorite) PostFavorite(ctx *gin.Context) {
@@ -54,7 +56,8 @@ func (h *HandlerFavorite) PostFavorite(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, result)
+	pkg.NewRes(200, result).Send(ctx)
+
 }
 
 func (h *HandlerFavorite) DeleteDataFavorite(ctx *gin.Context) {
@@ -70,5 +73,6 @@ func (h *HandlerFavorite) DeleteDataFavorite(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, result)
+	pkg.NewRes(200, result).Send(ctx)
+
 }

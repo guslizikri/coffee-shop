@@ -10,8 +10,8 @@ import (
 )
 
 type RepoFavoriteIF interface {
-	CreateFavorite(data *models.Favorite) (string, error)
-	DeleteFavorite(data *models.Favorite) (string, error)
+	CreateFavorite(data *models.Favorite) (*config.Result, error)
+	DeleteFavorite(data *models.Favorite) (*config.Result, error)
 	ReadFavorite(params models.Query) (*config.Result, error)
 }
 type RepoFavorite struct {
@@ -79,7 +79,7 @@ func (r *RepoFavorite) ReadFavorite(params models.Query) (*config.Result, error)
 	return &config.Result{Data: data, Meta: metas}, nil
 }
 
-func (r *RepoFavorite) CreateFavorite(data *models.Favorite) (string, error) {
+func (r *RepoFavorite) CreateFavorite(data *models.Favorite) (*config.Result, error) {
 	q := `insert into Favorites (product_id, user_id) 
 	VALUES(
 		:product_id,
@@ -88,18 +88,18 @@ func (r *RepoFavorite) CreateFavorite(data *models.Favorite) (string, error) {
 
 	_, err := r.NamedExec(q, data)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-
-	return "1 data Favorite created", nil
+	return &config.Result{Message: "1 data favorite created"}, nil
 
 }
 
-func (r *RepoFavorite) DeleteFavorite(data *models.Favorite) (string, error) {
+func (r *RepoFavorite) DeleteFavorite(data *models.Favorite) (*config.Result, error) {
 	query := `DELETE FROM public.favorites WHERE id=:id`
 	_, err := r.NamedExec(query, data)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return "delete Favorite data successful", nil
+	return &config.Result{Message: "1 data favorite deleted"}, nil
+
 }

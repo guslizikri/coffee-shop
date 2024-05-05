@@ -37,7 +37,8 @@ func (h *HandlerUser) GetUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, result)
+	pkg.NewRes(200, result).Send(ctx)
+
 }
 
 func (h *HandlerUser) PostUser(ctx *gin.Context) {
@@ -86,7 +87,8 @@ func (h *HandlerUser) PatchUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, result)
+	pkg.NewRes(200, result).Send(ctx)
+
 }
 
 func (h *HandlerUser) DeleteDataUser(ctx *gin.Context) {
@@ -102,5 +104,6 @@ func (h *HandlerUser) DeleteDataUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(200, result)
+	pkg.NewRes(200, result).Send(ctx)
+
 }

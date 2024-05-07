@@ -92,3 +92,19 @@ Currently, there are no contributors to this project. If you would like to contr
 ## Suggestion
 
 If you find bugs / find better ways / suggestions you can pull request.
+
+### build program
+
+## build go
+
+go build -o "./build/coffeeshopbe.exe" ./cmd/main.go
+
+## build docker image
+
+docker build -t nama_image:tag lokasi_dockerfile
+docker build -t nama_user_dockerhub/coffeeshopbe:tag .(titik = folder saat ini, ketika di terminal)
+docker build -t zikrigusli/coffeeshopbe:1 .
+
+## run image jadi container
+
+docker run --net coffeeshop -e DB_HOST=pglocal -p 8082:8081 zikrigusli/coffeeshopbe:3

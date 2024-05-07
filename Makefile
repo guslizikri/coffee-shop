@@ -1,4 +1,4 @@
-APP=goback
+APP=coffeeshopbe
 BUILD="./build/$(APP)"
 DB_DRIVER=postgres
 DB_SOURCE="postgresql://admin:admin@localhost/coffeeshop?sslmode=disable&search_path=public"
@@ -11,7 +11,7 @@ install:
 
 build:
 	CGO_ENABLED=0 GOOS=linux go build -o ${BUILD}
-
+# go build -o "./build/coffeeshopbe.exe" ./cmd/main.go
 test:
 	go test -cover -v ./...
 

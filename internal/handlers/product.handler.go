@@ -50,7 +50,9 @@ func (h *HandlerProduct) PostProduct(ctx *gin.Context) {
 	var product models.Product
 
 	if err := ctx.ShouldBind(&product); err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		pkg.NewRes(401, &config.Result{
+			Data: err.Error(),
+		}).Send(ctx)
 		return
 	}
 	product.Image = ctx.MustGet("image").(*string)

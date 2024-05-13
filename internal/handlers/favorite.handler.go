@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"coffee-shop/config"
 	"coffee-shop/internal/models"
 	"coffee-shop/internal/repository"
 	"coffee-shop/pkg"
@@ -34,7 +35,9 @@ func (h *HandlerFavorite) GetFavorite(ctx *gin.Context) {
 		Limit:    limitInt,
 		Category: "%" + category + "%"})
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		pkg.NewRes(401, &config.Result{
+			Data: err.Error(),
+		}).Send(ctx)
 		return
 	}
 
@@ -52,7 +55,9 @@ func (h *HandlerFavorite) PostFavorite(ctx *gin.Context) {
 
 	result, err := h.CreateFavorite(&Favorite)
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		pkg.NewRes(401, &config.Result{
+			Data: err.Error(),
+		}).Send(ctx)
 		return
 	}
 
@@ -69,7 +74,9 @@ func (h *HandlerFavorite) DeleteDataFavorite(ctx *gin.Context) {
 
 	result, err := h.DeleteFavorite(&Favorite)
 	if err != nil {
-		ctx.AbortWithError(http.StatusBadRequest, err)
+		pkg.NewRes(401, &config.Result{
+			Data: err.Error(),
+		}).Send(ctx)
 		return
 	}
 

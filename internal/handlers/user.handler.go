@@ -5,6 +5,7 @@ import (
 	"coffee-shop/internal/models"
 	"coffee-shop/internal/repository"
 	"coffee-shop/pkg"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -16,8 +17,23 @@ type HandlerUser struct {
 	repository.RepoUserIF
 }
 
-func NewUser(r *repository.RepoUser) *HandlerUser {
+func NewUser(r repository.RepoUserIF) *HandlerUser {
 	return &HandlerUser{r}
+}
+func (h *HandlerUser) GetById(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	result, err := h.GetUserById(id)
+	if err != nil {
+		log.Println(err)
+		pkg.NewRes(400, &config.Result{
+			Data: err.Error(),
+		}).Send(ctx)
+		return
+	}
+
+	pkg.NewRes(200, result).Send(ctx)
+
 }
 
 func (h *HandlerUser) GetUser(ctx *gin.Context) {

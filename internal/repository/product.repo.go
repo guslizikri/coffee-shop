@@ -36,13 +36,13 @@ func (r *RepoProduct) ReadProduct(params models.Query) (*config.Result, error) {
 	// filter injection, digunakan saat query count total data, karena tidak butuh meta jadi dibikin var baru
 	var filter []interface{}
 
-	if params.Name != "" {
+	if params.Name != "%%" {
 		filterQuery += "AND LOWER(name_product) like LOWER(?)"
 		filter = append(filter, params.Name)
 		args = append(args, params.Name)
 	}
 
-	if params.Category != "" {
+	if params.Category != "%%" {
 		filterQuery += `AND LOWER(category) like LOWER(?)`
 		filter = append(filter, params.Category)
 		args = append(args, params.Category)

@@ -1,10 +1,18 @@
 package main
 
 import (
+	"errors"
 	"log"
 
 	"github.com/gin-gonic/gin"
 )
+
+func SayHello(name string, err bool) (string, error) {
+	if err {
+		return "", errors.New("something wrong")
+	}
+	return "Hello " + name, nil
+}
 
 func example() {
 	router := gin.Default()

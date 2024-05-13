@@ -15,6 +15,7 @@ type RepoUserIF interface {
 	UpdateUser(data *models.User) (*config.Result, error)
 	DeleteUser(data *models.User) (*config.Result, error)
 	ReadUser(params models.Query) (*config.Result, error)
+	GetUserById(id string) (*config.Result, error)
 	GetAuthData(user string) (*models.User, error)
 }
 type RepoUser struct {
@@ -41,6 +42,17 @@ func (r *RepoUser) GetAuthData(user string) (*models.User, error) {
 	return &result, nil
 }
 
+func (r *RepoUser) GetUserById(id string) (*config.Result, error) {
+	var data models.User
+	q := `SELECT id, email, role, password, phone, displayname, image FROM users WHERE id = $1`
+
+	if err := r.Get(&data, q, id); err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	return &config.Result{Data: data}, nil
+}
+
 func (r *RepoUser) ReadUser(params models.Query) (*config.Result, error) {
 	var data models.Users
 	var metas config.Metas
@@ -54,7 +66,7 @@ func (r *RepoUser) ReadUser(params models.Query) (*config.Result, error) {
 	// filter injection, digunakan saat query count total data, karena tidak butuh meta jadi dibikin var baru
 	var filter []interface{}
 
-	if params.Name != "" {
+	if params.Name != "%%" {
 		filterQuery += `AND LOWER(displayname) like LOWER(?)`
 		filter = append(filter, params.Name)
 		args = append(args, params.Name)

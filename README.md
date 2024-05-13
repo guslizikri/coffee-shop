@@ -73,6 +73,16 @@ CoffeeShop.
    DB_PASS=""
    DB_PORT=5432
 
+   <!-- secret key JWT -->
+
+   JWT_KEYS="randomkey"
+
+   <!-- cloudinary -->
+
+   CD_NAME="yourclooudinaryname"
+   CD_KEY="yourcdkey"
+   CD_SECRET="yourcdsecret"
+
 ````
 
 5. Start the local server
@@ -93,18 +103,22 @@ Currently, there are no contributors to this project. If you would like to contr
 
 If you find bugs / find better ways / suggestions you can pull request.
 
-### build program
+### build program docker
 
-## build go
+1. build file go
+   go build -o "./build/coffeeshopbe.exe" ./cmd/main.go
 
-go build -o "./build/coffeeshopbe.exe" ./cmd/main.go
+2. build docker image
 
-## build docker image
+<!-- docker build -t nama_image:tag lokasi_dockerfile -->
+<!-- docker build -t nama_user_dockerhub/coffeeshopbe:tag .(titik = folder saat ini, ketika di terminal) -->
 
-docker build -t nama_image:tag lokasi_dockerfile
-docker build -t nama_user_dockerhub/coffeeshopbe:tag .(titik = folder saat ini, ketika di terminal)
 docker build -t zikrigusli/coffeeshopbe:1 .
 
-## run image jadi container
+## run and create container from image
 
-docker run --net coffeeshop -e DB_HOST=pglocal -p 8082:8081 zikrigusli/coffeeshopbe:3
+docker compose up -d
+
+## delete container
+
+docker compose down

@@ -27,8 +27,9 @@ func TestGetById(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	t.Run("getById", func(t *testing.T) {
-		r := gin.Default()
+		// r := gin.Default()
 		w := httptest.NewRecorder()
+		_, r := gin.CreateTestContext(w)
 
 		handler := NewUser(&repoUserMock)
 		exptedResult := &config.Result{Data: map[string]interface{}{
@@ -60,8 +61,9 @@ func TestGetById(t *testing.T) {
 	})
 
 	t.Run("user not found", func(t *testing.T) {
-		r := gin.Default()
+		// r := gin.Default()
 		w := httptest.NewRecorder()
+		_, r := gin.CreateTestContext(w)
 
 		handler := NewUser(&repoUserMock)
 		exptedError := errors.New("user not found")
@@ -90,7 +92,11 @@ func TestGetUser(t *testing.T) {
 		"displayname": "Magnus",
 		"phone":       "081034941",
 		"email":       "magnusgmailcom",
-		"create_at":   "2023-09-01T20:07:30.662605Z"}}
+		"create_at":   "2023-09-01T20:07:30.662605Z"}, Meta: map[string]interface{}{
+		"next":  "",
+		"prev":  "",
+		"total": "1",
+	}}
 	repoUserMock.On("ReadUser", mock.Anything).Return(exptedResult, nil)
 
 	r.GET("/get", handler.GetUser)
@@ -107,6 +113,11 @@ func TestGetUser(t *testing.T) {
 			"phone": "081034941",
 			"email": "magnusgmailcom",
 			"create_at": "2023-09-01T20:07:30.662605Z"
+		},
+		"meta": {
+			"next": "", 
+			"prev": "", 
+			"total": "1"
 		}
 	}`
 	assert.JSONEq(t, exptedResponse, w.Body.String())
